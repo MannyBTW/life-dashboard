@@ -1,6 +1,6 @@
 import sys
 from sidebar import Sidebar
-from home_page import HomePage
+from pages import HomePage, NotesPage, FinancePage, HabitsPage
 from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QLabel, QPushButton, QVBoxLayout, QMainWindow, QHBoxLayout
                             
 
@@ -14,43 +14,20 @@ class Dashboard(QMainWindow):
         #Create sidebar
         self.sidebar = Sidebar()
 
-        #Create homepage
+        #Create pages
         home_page = HomePage()
+        notes_page = NotesPage()
+        finance_page = FinancePage()
+        habits_page = HabitsPage()
 
         #Create stacked widget of tabs
-
-        notes_widget = QWidget()
-        finance_widget = QWidget()
-        habits_widget = QWidget()
-
         self.stacked_widget = QStackedWidget()
 
         self.stacked_widget.addWidget(home_page)
-        self.stacked_widget.addWidget(notes_widget)
-        self.stacked_widget.addWidget(finance_widget)
-        self.stacked_widget.addWidget(habits_widget)
-
-        #Create layouts for individual widgets
+        self.stacked_widget.addWidget(notes_page)
+        self.stacked_widget.addWidget(finance_page)
+        self.stacked_widget.addWidget(habits_page)
         
-        notes_layout = QVBoxLayout()
-        finance_layout = QVBoxLayout()
-        habits_layout = QVBoxLayout()
-        
-
-        #Create labels for each widget page
-        
-        notes_label = QLabel("This is the notes page")
-        notes_layout.addWidget(notes_label)
-        finance_label = QLabel("This is the finance page")
-        finance_layout.addWidget(finance_label) 
-        habits_label = QLabel("This is the habits page")
-        habits_layout.addWidget(habits_label)
-
-        #Set layouts of individual pages
-        notes_widget.setLayout(notes_layout)
-        finance_widget.setLayout(finance_layout)
-        habits_widget.setLayout(habits_layout)
-
         #Connect buttons to respective tabs
         self.sidebar.buttons['home'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
         self.sidebar.buttons['notes'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))

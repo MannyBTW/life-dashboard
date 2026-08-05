@@ -54,6 +54,8 @@ class NotesPage(QWidget):
                 note = self.notes[row] #Get that note in order to modify it
                 note['title'] = self.note_title.text()
                 note['content'] = self.note_body.toPlainText()
+
+                self.note_list.currentItem().setText(note["title"])
             else: #If an existing note is not selected
                 title = self.note_title.text() #Get text of title and content
                 content = self.note_body.toPlainText()

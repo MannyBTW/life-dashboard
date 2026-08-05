@@ -32,10 +32,15 @@ class NotesPage(QWidget):
         self.new_note_button = QPushButton("New Note")
         self.new_note_button.clicked.connect(self.new_note)
 
+        self.delete_note_button = QPushButton("Delete Note")
+        self.delete_note_button.clicked.connect(self.delete_note)
+        self.delete_note_button.setVisible(False)
+        
         self.note_layout.addWidget(self.note_title)
         self.note_layout.addWidget(self.note_body)
         self.note_layout.addWidget(self.save_note_button)
         self.note_layout.addWidget(self.new_note_button)
+        self.note_layout.addWidget(self.delete_note_button)
         self.note_layout.addWidget(self.note_list)
         self.note_layout.addStretch()
 
@@ -43,7 +48,6 @@ class NotesPage(QWidget):
 
         #Selecting notes
         self.note_list.currentRowChanged.connect(self.display_note)
-            
 
 
 
@@ -97,17 +101,23 @@ class NotesPage(QWidget):
         if row != -1:
             self.note_title.setText(self.notes[row]['title'])
             self.note_body.setText(self.notes[row]['content'])
+            self.delete_note_button.setVisible(True)
         else:
             self.note_title.clear()
             self.note_body.clear()
+            self.delete_note_button.setVisible(False)
     
     def new_note(self):
         self.note_title.clear()
         self.note_body.clear()
         self.note_list.setCurrentRow(-1)
-        
-        
 
+    def delete_note(self):
+        row = self.note_list.currentRow()
+        
+        self.note_list.takeItem(row)
+        self.notes.remove(self.notes[row])
+   
     
 class FinancePage(QWidget):
 

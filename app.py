@@ -1,4 +1,5 @@
 import sys
+from sidebar import Sidebar
 from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QLabel, QPushButton, QVBoxLayout, QMainWindow, QHBoxLayout
                             
 
@@ -8,23 +9,9 @@ class Dashboard(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("Life Dashboard")
         self.resize(900, 600)
-
-        #Create sidebar buttons
-        self.home_button = QPushButton("Home")
-        self.notes_button = QPushButton("Notes")
-        self.finance_button = QPushButton("Finance")
-        self.habits_button = QPushButton("Habits")
         
-        #Create sidebar layout
-        sidebar_layout = QVBoxLayout()
-        sidebar_layout.addWidget(self.home_button)
-        sidebar_layout.addWidget(self.notes_button)
-        sidebar_layout.addWidget(self.finance_button)
-        sidebar_layout.addWidget(self.habits_button)
-        sidebar_layout.addStretch()
-        
-        sidebar_widget = QWidget()
-        sidebar_widget.setLayout(sidebar_layout)
+        #Create sidebar
+        self.sidebar = Sidebar()
 
         #Create stacked widget of tabs
         home_widget = QWidget()
@@ -32,12 +19,12 @@ class Dashboard(QMainWindow):
         finance_widget = QWidget()
         habits_widget = QWidget()
 
-        stacked_widget = QStackedWidget()
+        self.stacked_widget = QStackedWidget()
 
-        stacked_widget.addWidget(home_widget)
-        stacked_widget.addWidget(notes_widget)
-        stacked_widget.addWidget(finance_widget)
-        stacked_widget.addWidget(habits_widget)
+        self.stacked_widget.addWidget(home_widget)
+        self.stacked_widget.addWidget(notes_widget)
+        self.stacked_widget.addWidget(finance_widget)
+        self.stacked_widget.addWidget(habits_widget)
 
         #Create layouts for individual widgets
         home_layout = QVBoxLayout()
@@ -63,15 +50,15 @@ class Dashboard(QMainWindow):
         habits_widget.setLayout(habits_layout)
 
         #Connect buttons to respective tabs
-        self.home_button.clicked.connect(lambda: stacked_widget.setCurrentIndex(0))
-        self.notes_button.clicked.connect(lambda: stacked_widget.setCurrentIndex(1))
-        self.finance_button.clicked.connect(lambda: stacked_widget.setCurrentIndex(2))
-        self.habits_button.clicked.connect(lambda: stacked_widget.setCurrentIndex(3))
+        self.sidebar.buttons['home'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
+        self.sidebar.buttons['notes'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))
+        self.sidebar.buttons['finance'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(2))
+        self.sidebar.buttons['habits'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(3))
 
         #Put all widgets in screen layout
         main_layout = QHBoxLayout()
-        main_layout.addWidget(sidebar_widget)
-        main_layout.addWidget(stacked_widget, 1)
+        main_layout.addWidget(self.sidebar)
+        main_layout.addWidget(self.stacked_widget, 1)
 
         central_widget = QWidget()
         central_widget.setLayout(main_layout)

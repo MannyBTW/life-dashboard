@@ -1,7 +1,7 @@
 import sys
 from sidebar import Sidebar
 from pages import HomePage, NotesPage, FinancePage, HabitsPage
-from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QLabel, QPushButton, QVBoxLayout, QMainWindow, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QMainWindow, QHBoxLayout
                             
 
 class Dashboard(QMainWindow):
@@ -27,7 +27,7 @@ class Dashboard(QMainWindow):
         self.stacked_widget.addWidget(notes_page)
         self.stacked_widget.addWidget(finance_page)
         self.stacked_widget.addWidget(habits_page)
-        
+
         #Connect buttons to respective tabs
         self.sidebar.buttons['home'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(0))
         self.sidebar.buttons['notes'].clicked.connect(lambda: self.stacked_widget.setCurrentIndex(1))

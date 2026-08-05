@@ -116,7 +116,12 @@ class NotesPage(QWidget):
         row = self.note_list.currentRow()
         
         self.note_list.takeItem(row)
-        self.notes.remove(self.notes[row])
+        del self.notes[row]
+
+        #Clear text boxes if no notes left
+        if not self.notes:
+            self.note_title.clear()
+            self.note_body.clear()
    
     
 class FinancePage(QWidget):

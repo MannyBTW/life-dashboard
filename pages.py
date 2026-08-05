@@ -52,6 +52,11 @@ class NotesPage(QWidget):
             if self.note_list.currentRow() != -1: #If an existing note is selected
                 row = self.note_list.currentRow() 
                 note = self.notes[row] #Get that note in order to modify it
+
+                if not self.note_title.text() or not self.note_body.toPlainText(): #Return if empty 
+                    print("Title and note content cannot be empty.")
+                    return
+
                 note['title'] = self.note_title.text()
                 note['content'] = self.note_body.toPlainText()
 

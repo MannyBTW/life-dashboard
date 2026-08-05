@@ -1,5 +1,6 @@
 import sys
 from sidebar import Sidebar
+from home_page import HomePage
 from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QLabel, QPushButton, QVBoxLayout, QMainWindow, QHBoxLayout
                             
 
@@ -13,29 +14,31 @@ class Dashboard(QMainWindow):
         #Create sidebar
         self.sidebar = Sidebar()
 
+        #Create homepage
+        home_page = HomePage()
+
         #Create stacked widget of tabs
-        home_widget = QWidget()
+
         notes_widget = QWidget()
         finance_widget = QWidget()
         habits_widget = QWidget()
 
         self.stacked_widget = QStackedWidget()
 
-        self.stacked_widget.addWidget(home_widget)
+        self.stacked_widget.addWidget(home_page)
         self.stacked_widget.addWidget(notes_widget)
         self.stacked_widget.addWidget(finance_widget)
         self.stacked_widget.addWidget(habits_widget)
 
         #Create layouts for individual widgets
-        home_layout = QVBoxLayout()
+        
         notes_layout = QVBoxLayout()
         finance_layout = QVBoxLayout()
         habits_layout = QVBoxLayout()
         
 
         #Create labels for each widget page
-        home_label = QLabel("This is the home page")
-        home_layout.addWidget(home_label)
+        
         notes_label = QLabel("This is the notes page")
         notes_layout.addWidget(notes_label)
         finance_label = QLabel("This is the finance page")
@@ -44,7 +47,6 @@ class Dashboard(QMainWindow):
         habits_layout.addWidget(habits_label)
 
         #Set layouts of individual pages
-        home_widget.setLayout(home_layout)
         notes_widget.setLayout(notes_layout)
         finance_widget.setLayout(finance_layout)
         habits_widget.setLayout(habits_layout)

@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date
+
 
 DATABASE_NAME = "life_dashboard.db"
 
@@ -131,7 +131,7 @@ def get_completed_habit_ids(date):
             (date,),
         )
         rows = cursor.fetchall()
-        return [row[0] for row in rows]
+        return [row[1] for row in rows]
 
 def delete_habit(habit_id):
     with sqlite3.connect(DATABASE_NAME) as connection:

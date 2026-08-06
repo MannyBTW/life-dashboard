@@ -1,5 +1,6 @@
-from PySide6.QtWidgets import QWidget, QListWidget, QListWidgetItem, QLabel, QVBoxLayout, QLineEdit, QTextEdit, QPushButton
-from database import add_note, delete_note, get_notes, update_note
+from PySide6.QtWidgets import QWidget, QListWidget, QHBoxLayout, QListWidgetItem, QLabel, QVBoxLayout, QLineEdit, QTextEdit, QPushButton
+from database import add_note, delete_note, get_notes, update_note, add_habit, delete_habit, get_habits
+from datetime import date
 
 class HomePage(QWidget):
 
@@ -132,10 +133,7 @@ class NotesPage(QWidget):
             self.note_title.clear()
             self.note_body.clear()
         
-
-    
-   
-    
+  
 class FinancePage(QWidget):
 
     def __init__(self, parent=None):
@@ -152,10 +150,68 @@ class HabitsPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        #Create layout
+        #Create layouts
+        self.habit_entry_layout = QHBoxLayout()
         self.habits_layout = QVBoxLayout()
+
+        #Create top line
+        habit_entry_widget = QWidget()
+        habit_entry_widget.setLayout(self.habit_entry_layout)
+
+        self.habit_entry = QLineEdit()
+        self.habit_entry_button = QPushButton("Add Habit")
+        self.habit_remove_button = QPushButton("Delete Habit")
+
+        self.habit_entry_layout.addWidget(self.habit_entry)
+        self.habit_entry_layout.addWidget(self.habit_entry_button)
+        self.habit_entry_layout.addWidget(self.habit_remove_button)
+
+        #Add habit and delete habbit buttons
+        self.habit_entry_button.clicked.connect(self.enter_habit)
+        self.habit_remove_button.clicked.connect(self.remove_habit)
+
+        #Add top line to layout
+        self.habits_layout.addWidget(habit_entry_widget)
+        self.habits_layout.addStretch()
+
+        #Create list of habits
+        self.habit_list = QListWidget()
+        
         self.setLayout(self.habits_layout)
+        self.habits_layout.addWidget(self.habit_list)
+
+        #Load habits
+        self.load_habits()
 
         
+
+
+
+    def enter_habit(self):
+        add_habit(self.habit_entry.text())
+        self.habit_list.addItem(self.habit_entry.text())
+        self.habit_entry.clear()
+    
+    def remove_habit(self):
+        row = self.habit_list.currentRow()
+        habits = get_habits()
+        delete_habit(habits[row][0])
+        print("Habit deleted")
+
+        self.refresh_habits()
+        
+    def load_habits(self):
+        for habit in get_habits():
+            self.habit_list.addItem(habit[1])
+
+    def refresh_habits(self):
+        self.habit_list.clear()
+        for habit in get_habits():
+            self.habit_list.addItem(habit[1])
+
+
+
+
+
 
         

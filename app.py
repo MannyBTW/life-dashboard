@@ -1,4 +1,5 @@
 import sys
+from database import *
 from sidebar import Sidebar
 from pages import HomePage, NotesPage, FinancePage, HabitsPage
 from PySide6.QtWidgets import QWidget, QStackedWidget, QApplication, QMainWindow, QHBoxLayout
@@ -43,14 +44,23 @@ class Dashboard(QMainWindow):
         central_widget.setLayout(main_layout)
 
         self.setCentralWidget(central_widget)
-        
 
-#Create application instance 
-app = QApplication(sys.argv)
+def main():
 
-#Create Dashboard
-dashboard = Dashboard()
-dashboard.show()
+    #Create application instance 
+    app = QApplication(sys.argv)
 
-#Open app
-app.exec()
+    #Create database
+    create_database()
+
+    #Create Dashboard
+    dashboard = Dashboard()
+    dashboard.show()
+
+    #Open app
+    app.exec()
+
+#RUN THIS CODE IF IT IS DIRECTLY RUN FROM HERE (not imports)
+if __name__ == "__main__":
+    main()
+

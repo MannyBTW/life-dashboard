@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QListWidget, QListWidgetItem, QLabel, QVBoxLayout, QLineEdit, QTextEdit, QPushButton
-
+from database import add_note, delete_note, get_notes, update_note
 
 class HomePage(QWidget):
 
@@ -20,11 +20,15 @@ class NotesPage(QWidget):
         #Create layout
         self.note_layout = QVBoxLayout()
 
-        self.notes = []
+        self.notes = get_notes()
+        print(self.notes)
 
         self.note_title = QLineEdit()
         self.note_body = QTextEdit()
         self.note_list = QListWidget()
+
+        #Load stored notes
+        self.load_notes()
         
         self.save_note_button = QPushButton("Save Note")
         self.save_note_button.clicked.connect(self.save_note)
@@ -48,59 +52,62 @@ class NotesPage(QWidget):
 
         #Selecting notes
         self.note_list.currentRowChanged.connect(self.display_note)
-
-
-
-    def save_note(self):
- 
-            if self.note_list.currentRow() != -1: #If an existing note is selected
-                row = self.note_list.currentRow() 
-                note = self.notes[row] #Get that note in order to modify it
-
-                if not self.note_title.text() or not self.note_body.toPlainText(): #Return if empty 
-                    print("Title and note content cannot be empty.")
-                    return
-
-                note['title'] = self.note_title.text()
-                note['content'] = self.note_body.toPlainText()
-
-                self.note_list.currentItem().setText(note["title"])
-            else: #If an existing note is not selected
-                title = self.note_title.text() #Get text of title and content
-                content = self.note_body.toPlainText()
-
-                if not title or not content: #Return if empty 
-                    print("Title and note content cannot be empty.")
-                    return
-
-                if self.notes: #If a note exists
-                    note_id = max(note['id'] for note in self.notes) + 1 #Make this a new note
-                else: #If no note exists then start the ids at 1
-                    note_id = 1
-
-                note = {
-                    "title": title,
-                    "content": content,
-                    "id": note_id
-                }
-
-                self.notes.append(note)
-                self.note_list.addItem(note["title"])
-
-                self.note_title.clear()
-                self.note_body.clear()
-
-                print("Note saved!")
-                print(self.notes)
-
-        
-   
     
+        
+    def load_notes(self):
+        #Load titles
+        for note in self.notes:
+            self.note_list.addItem(note[1])
+
+    def refresh_notes(self, selected_note_id=None):
+        #Clear existing notes in note list and refresh from db
+        self.note_list.clear()
+        self.notes = get_notes()
+
+        #Add notes to UI
+        for note in self.notes:
+            self.note_list.addItem(note[1])
+        
+        #Show selected item again, since clearing the note list would 
+        #deselect any item
+        for row, note in enumerate(self.notes):
+            if note[0] == selected_note_id:
+                self.note_list.setCurrentRow(row)
+                break
+        
+        
+    def save_note(self):
+        #Define row, title, and content of the note
+        row = self.note_list.currentRow()
+        title = self.note_title.text().strip()
+        content = self.note_body.toPlainText().strip()
+
+        #Validate if fields are empty, if so return
+        if not self.note_title.text() or not self.note_body.toPlainText():
+                print("Title and note content cannot be empty.")
+                return
+
+        if row != -1: #If an existing note is selected
+            
+            #Then save the existing note by updating it in the db
+            update_note(self.notes[row][0], title, content)
+
+        else: #If an existing note is not selected (aka, its a new note)
+
+            #Add a new note to the db
+            add_note(title, content)
+
+            print("Note saved!")
+            print(self.notes)
+        
+        #Refresh UI, keeping id of selected item
+        self.refresh_notes(self.notes[row][0])
+
     def display_note(self, row):
         
         if row != -1:
-            self.note_title.setText(self.notes[row]['title'])
-            self.note_body.setText(self.notes[row]['content'])
+            self.note_title.setText(self.notes[row][1])
+            self.note_body.setText(self.notes[row][2])
             self.delete_note_button.setVisible(True)
         else:
             self.note_title.clear()
@@ -114,14 +121,18 @@ class NotesPage(QWidget):
 
     def delete_note(self):
         row = self.note_list.currentRow()
-        
-        self.note_list.takeItem(row)
-        del self.notes[row]
+        note_id = self.notes[row][0] 
+
+        delete_note(note_id)
+        self.refresh_notes()
 
         #Clear text boxes if no notes left
         if not self.notes:
             self.note_title.clear()
             self.note_body.clear()
+        
+
+    
    
     
 class FinancePage(QWidget):

@@ -37,7 +37,14 @@ def get_notes():
         notes = cursor.fetchall()
         return notes
 
-
+def get_id(title):
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        cursor = connection.cursor()
+        cursor.execute(
+            '''SELECT * FROM notes
+            WHERE title = ?''',
+            (title,)
+        )
 
 def update_note(note_id, title, content):
     with sqlite3.connect(DATABASE_NAME) as connection:

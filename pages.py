@@ -89,7 +89,7 @@ class NotesPage(QWidget):
 
         if row != -1: #If an existing note is selected
             
-            selected_note_id = self.notes[row[0]]
+            selected_note_id = self.notes[row][0]
             #Then save the existing note by updating it in the db
             update_note(self.notes[row][0], title, content)
 
@@ -153,8 +153,9 @@ class HabitsPage(QWidget):
         super().__init__(parent)
 
         #Create layout
-        self.layout = QVBoxLayout()
-        self.label = QLabel("This is the habits page")
-        self.layout.addWidget(self.label)
-        self.setLayout(self.layout)
+        self.habits_layout = QVBoxLayout()
+        self.setLayout(self.habits_layout)
+
+        
+
         

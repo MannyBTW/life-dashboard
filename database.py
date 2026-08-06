@@ -26,6 +26,8 @@ def add_note(title, content):
             (title, content),
         )
 
+        return cursor.lastrowid
+
 
 def get_notes():
     with sqlite3.connect(DATABASE_NAME) as connection:

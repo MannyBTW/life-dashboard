@@ -83,25 +83,26 @@ class NotesPage(QWidget):
         content = self.note_body.toPlainText().strip()
 
         #Validate if fields are empty, if so return
-        if not self.note_title.text() or not self.note_body.toPlainText():
+        if not title or not content:
                 print("Title and note content cannot be empty.")
                 return
 
         if row != -1: #If an existing note is selected
             
+            selected_note_id = self.notes[row[0]]
             #Then save the existing note by updating it in the db
             update_note(self.notes[row][0], title, content)
 
         else: #If an existing note is not selected (aka, its a new note)
 
             #Add a new note to the db
-            add_note(title, content)
+            selected_note_id = add_note(title, content)
 
             print("Note saved!")
             print(self.notes)
         
         #Refresh UI, keeping id of selected item
-        self.refresh_notes(self.notes[row][0])
+        self.refresh_notes(selected_note_id)
 
     def display_note(self, row):
         

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import date
 
 DATABASE_NAME = "life_dashboard.db"
 
@@ -28,8 +29,9 @@ def create_database():
         cursor.execute(
             '''CREATE TABLE IF NOT EXISTS completed_habits (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                habit_id INTEGER,
-                name TEXT NOT NULL
+                habit_id INTEGER NOT NULL,
+                completed_date TEXT NOT NULL,
+                UNIQUE(habit_id, completed_date)
             )'''
         )
 
@@ -110,13 +112,13 @@ def get_habits():
         habits = cursor.fetchall()
         return habits
 
-def complete_habit(habit_id, date):
+def complete_habit(habit_id, completed_date):
     with sqlite3.connect(DATABASE_NAME) as connection:
         cursor = connection.cursor()
 
         cursor.execute(
-            "INSERT INTO completed_habits (habit_id, date) VALUES (?, ?)",
-            (habit_id, date)
+            "INSERT INTO completed_habits (habit_id, completed_date) VALUES (?, ?)",
+            (habit_id, completed_date),
         )
 
 def get_completed_habit_ids(date):
@@ -124,9 +126,12 @@ def get_completed_habit_ids(date):
         cursor = connection.cursor()
 
         cursor.execute(
-            "SELECT * FROM completed_habits"
+            '''SELECT * FROM completed_habits
+            WHERE completed_date = ?''',
+            (date,),
         )
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+        return [row[0] for row in rows]
 
 def delete_habit(habit_id):
     with sqlite3.connect(DATABASE_NAME) as connection:
@@ -136,4 +141,15 @@ def delete_habit(habit_id):
             '''DELETE FROM habits
             WHERE id = ?''',
             (habit_id,),
+        )
+
+def delete_completed_habit(habit_id, completed_date):
+    with sqlite3.connect(DATABASE_NAME) as connection:
+        cursor = connection.cursor()
+
+        cursor.execute(
+            '''DELETE FROM completed_habits
+            WHERE habit_id = ?
+            AND completed_date = ?''',
+            (habit_id, completed_date),
         )

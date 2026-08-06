@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QWidget, QListWidget, QHBoxLayout, QListWidgetItem, QLabel, QVBoxLayout, QLineEdit, QTextEdit, QPushButton
-from database import add_note, delete_note, get_notes, update_note, add_habit, delete_habit, get_habits
+from PySide6.QtCore import Qt
+from database import add_note, delete_note, get_notes, update_note, add_habit, delete_habit, get_habits, complete_habit, get_completed_habit_ids, delete_completed_habit
 from datetime import date
 
 class HomePage(QWidget):
@@ -180,16 +181,17 @@ class HabitsPage(QWidget):
         self.setLayout(self.habits_layout)
         self.habits_layout.addWidget(self.habit_list)
 
+        #Create signal for checked box
+        self.habit_list.itemChanged.connect(self.finish_habit)
+
         #Load habits
-        self.load_habits()
-
-        
-
+        self.refresh_habits()
 
 
     def enter_habit(self):
         add_habit(self.habit_entry.text())
-        self.habit_list.addItem(self.habit_entry.text())
+        self.refresh_habits()
+
         self.habit_entry.clear()
     
     def remove_habit(self):
@@ -200,14 +202,47 @@ class HabitsPage(QWidget):
 
         self.refresh_habits()
         
-    def load_habits(self):
-        for habit in get_habits():
-            self.habit_list.addItem(habit[1])
 
     def refresh_habits(self):
+        today = date.today().isoformat()
+        completed_ids = get_completed_habit_ids(today)
+
+        # Prevent itemChanged from firing while rebuilding the list
+        self.habit_list.blockSignals(True)
+
         self.habit_list.clear()
+
         for habit in get_habits():
-            self.habit_list.addItem(habit[1])
+            habit_id = habit[0]
+            habit_name = habit[1]
+
+            item = QListWidgetItem(habit_name)
+
+            # Store the database ID inside the list item
+            item.setData(Qt.ItemDataRole.UserRole, habit_id)
+
+            # Make the item checkable
+            item.setFlags(
+                item.flags() | Qt.ItemFlag.ItemIsUserCheckable
+            )
+
+            if habit_id in completed_ids:
+                item.setCheckState(Qt.CheckState.Checked)
+            else:
+                item.setCheckState(Qt.CheckState.Unchecked)
+
+            self.habit_list.addItem(item)
+
+        self.habit_list.blockSignals(False)
+    
+    def finish_habit(self, item):
+        if item.checkState() == Qt.CheckState.Checked and item.data(Qt.ItemDataRole.UserRole) not in get_completed_habit_ids(str(date.today().isoformat())):
+            complete_habit(item.data(Qt.ItemDataRole.UserRole), date.today().isoformat())
+            print("Completed habit")
+        elif item.checkState() == Qt.CheckState.Unchecked:
+            delete_completed_habit(item.data(Qt.ItemDataRole.UserRole), date.today().isoformat())
+
+        
 
 
 
